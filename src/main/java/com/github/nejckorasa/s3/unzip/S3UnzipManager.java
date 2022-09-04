@@ -48,15 +48,15 @@ public class S3UnzipManager {
                 .forEach(objSum -> getObjectIfZip(bucketName, objSum).ifPresent(obj -> unzip(obj, outputPrefix)));
     }
 
-    public void unzipObjectsKeyContaining(String bucketName, String inputPrefix, String keyMatchingString, String outputPrefix) {
+    public void unzipObjectsKeyContaining(String bucketName, String inputPrefix, String outputPrefix, String keyContaining) {
         findObjectSummaries(bucketName, inputPrefix).stream()
-                .filter(objSum -> objSum.getKey().contains(keyMatchingString))
+                .filter(objSum -> objSum.getKey().contains(keyContaining))
                 .forEach(objSum -> getObjectIfZip(bucketName, objSum).ifPresent(obj -> unzip(obj, outputPrefix)));
     }
 
-    public void unzipObjectsKeyMatching(String bucketName, String inputPrefix, String keyMatchingString, String outputPrefix) {
+    public void unzipObjectsKeyMatching(String bucketName, String inputPrefix, String outputPrefix, String keyMatching) {
         findObjectSummaries(bucketName, inputPrefix).stream()
-                .filter(objSum -> objSum.getKey().matches(keyMatchingString))
+                .filter(objSum -> objSum.getKey().matches(keyMatching))
                 .forEach(objSum -> getObjectIfZip(bucketName, objSum).ifPresent(obj -> unzip(obj, outputPrefix)));
     }
 

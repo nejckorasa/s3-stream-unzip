@@ -2,7 +2,6 @@ package com.github.nejckorasa.s3;
 
 import com.github.nejckorasa.s3.unzip.S3UnzipManager;
 import com.github.nejckorasa.s3.unzip.strategy.NoSplitUnzipStrategy;
-import com.github.nejckorasa.s3.utils.FileUtils;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -17,15 +16,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONCompareMode.LENIENT;
 
 public class UnzipTest {
-
     public static final String BUCKET_NAME = "test-bucket";
+
     @RegisterExtension
     private final S3Test s3 = new S3Test();
-
-    @Test
-    public void a() {
-        FileUtils.generateCsv("file.csv", 10000);
-    }
 
     @Test
     public void unzipsResources() {
@@ -34,8 +28,8 @@ public class UnzipTest {
         s3.uploadFrom("test-data/zip").contentType("application/zip").to("s3://test-bucket/input");
         s3.verifyBucketFileCount("s3://test-bucket", 3);
 
-        new S3UnzipManager(s3.s3Client, new NoSplitUnzipStrategy())
-                .unzipObjects(BUCKET_NAME, "input", "output");
+        var um = new S3UnzipManager(s3.s3Client, new NoSplitUnzipStrategy());
+        um.unzipObjects(BUCKET_NAME, "input", "output");
 
         s3.verifyBucketFileCount("s3://test-bucket/input", 3);
         s3.verifyBucketFileCount("s3://test-bucket/output", 2);

@@ -32,18 +32,28 @@ public class S3Test implements BeforeEachCallback, AfterEachCallback {
 
     public static final String US_EAST_1 = "us-east-1";
 
+    String localFileBackendPath;
+
     S3Mock api;
 
     int port;
 
     AmazonS3 s3Client;
 
+    public S3Test withLocalFileBackend(String path) {
+        localFileBackendPath = path;
+        return this;
+    }
+
     @Override
     public void beforeEach(ExtensionContext extensionContext) {
-        api = new S3Mock.Builder()
-                .withInMemoryBackend()
-                .withPort(0)
-                .build();
+        var apiBuilder = new S3Mock.Builder().withPort(0);
+        if (localFileBackendPath != null) {
+            apiBuilder.withFileBackend(localFileBackendPath);
+        } else {
+            apiBuilder.withInMemoryBackend();
+        }
+        api = apiBuilder.build();
 
         var serverBinding = api.start();
         port = serverBinding.localAddress().getPort();
