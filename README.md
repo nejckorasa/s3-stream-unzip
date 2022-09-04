@@ -12,7 +12,7 @@ use [S3UnzipManager.java](src/main/java/com/github/nejckorasa/s3/unzip/S3UnzipMa
 UnzipStrategy strategy = new NoSplitUnzipStrategy();
 
 // create UnzipStrategy with additional config
- var config = new S3MultipartUpload.Config()
+var config = new S3MultipartUpload.Config()
         .withThreadCount(5)
         .withQueueSize(5)
         .withAwaitTerminationTimeSeconds(2)
