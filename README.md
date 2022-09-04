@@ -1,4 +1,4 @@
-[![Maven Build](https://github.com/nejckorasa/s3-stream-unzip/actions/workflows/maven.yml/badge.svg)](https://github.com/riZZZhik/belinsky/actions/workflows/tests.yaml)
+[![Maven Build](https://github.com/nejckorasa/s3-stream-unzip/actions/workflows/maven.yml/badge.svg)](https://github.com/nejckorasa/s3-stream-unzip/actions/workflows/maven.yml)
 
 
 # s3-stream-unzip
