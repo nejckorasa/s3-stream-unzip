@@ -97,7 +97,9 @@ public class S3MultipartUpload {
         initRequest.setTagging(new ObjectTagging(new ArrayList<>()));
 
         var metadata = new ObjectMetadata();
-        metadata.setContentType(config.contentType);
+        if (config.contentType != null) {
+            metadata.setContentType(config.contentType);
+        }
         initRequest.setObjectMetadata(metadata);
 
         if (config.cannedAcl != null) {

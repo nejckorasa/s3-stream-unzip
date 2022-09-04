@@ -29,15 +29,14 @@ public class NoSplitUnzipStrategy implements UnzipStrategy {
     @Override
     public void unzip(UnzipTask unzipTask, AmazonS3 s3Client) {
         String filename = unzipTask.filename();
-        long compressedSizeInMB = unzipTask.compressedSizeInMB();
-        long sizeInMB = unzipTask.sizeInMB();
+        long compressedSize = unzipTask.compressedSize();
+        long size = unzipTask.size();
 
         String key = unzipTask.key();
         var multipartUpload = new S3MultipartUpload(unzipTask.bucketName(), key, s3Client, config);
         multipartUpload.initializeUpload();
 
-        log.info("Unzipping {}, compressed: {} MB, extracted: {} MB to {}", filename, compressedSizeInMB, sizeInMB, key);
-
+        log.info("Unzipping {}, compressed: {} bytes, extracted: {} bytes to {}", filename, compressedSize, size, key);
         try {
             int bytesRead;
             long allBytesRead = 0;
@@ -58,9 +57,7 @@ public class NoSplitUnzipStrategy implements UnzipStrategy {
                 partsCount += 1;
                 allBytesRead += bytesRead;
 
-                long allMBRead = allBytesRead * MB;
-
-                log.info("Uploading part [{}] for file: {} - Read {} MB out of {} MB", partsCount, filename, allMBRead, sizeInMB);
+                log.debug("Uploading part [{}] for file: {} - Read {} bytes out of {} bytes", partsCount, filename, allBytesRead, size);
 
                 multipartUpload.uploadPart(new ByteArrayInputStream(outputStream.toByteArray()));
                 outputStream.reset();
@@ -68,6 +65,7 @@ public class NoSplitUnzipStrategy implements UnzipStrategy {
             }
 
             multipartUpload.uploadFinalPart(new ByteArrayInputStream(outputStream.toByteArray()));
+            log.info("Unzipped and uploaded file: {} in {} parts", filename, partsCount);
 
         } catch (Throwable t) {
             multipartUpload.abort();

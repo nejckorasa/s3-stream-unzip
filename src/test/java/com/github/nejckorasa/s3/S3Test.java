@@ -83,24 +83,26 @@ public class S3Test implements BeforeEachCallback, AfterEachCallback {
 
     public S3Object download(String s3Path) {
         var uri = new AmazonS3URI(s3Path);
-        return s3Client.getObject(uri.getBucket(), uri.getKey());
+        if (s3Client.doesObjectExist(uri.getBucket(), uri.getKey())) {
+            return s3Client.getObject(uri.getBucket(), uri.getKey());
+        } else {
+            throw new IllegalStateException("Expected s3 object to exist but did not " + s3Path);
+        }
     }
 
     public String downloadAsString(String s3Path) {
         var s3Object = download(s3Path);
-        if (s3Object != null) {
-            try (var inputStream = s3Object.getObjectContent()) {
-                return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
+        try (var inputStream = s3Object.getObjectContent()) {
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
-        return null;
     }
 
     public final class Upload {
         private final Map<String, String> resources;
         private boolean createBuckets = false;
+        private String contentType = null;
 
         @SneakyThrows
         private Upload(String path) {
@@ -116,6 +118,11 @@ public class S3Test implements BeforeEachCallback, AfterEachCallback {
             return this;
         }
 
+        public Upload contentType(String contentType) {
+            this.contentType = contentType;
+            return this;
+        }
+
         public void to(String destination) {
             resources.forEach((path, name) -> {
                 try (var inputStream = Files.newInputStream(Path.of(path))) {
@@ -123,7 +130,11 @@ public class S3Test implements BeforeEachCallback, AfterEachCallback {
                     if (createBuckets && !s3Client.doesBucketExistV2(uri.getBucket())) {
                         s3Client.createBucket(uri.getBucket());
                     }
-                    s3Client.putObject(uri.getBucket(), uri.getKey() + "/" + name, inputStream, new ObjectMetadata());
+                    var metadata = new ObjectMetadata();
+                    if (contentType != null) {
+                        metadata.setContentType(contentType);
+                    }
+                    s3Client.putObject(uri.getBucket(), uri.getKey() + "/" + name, inputStream, metadata);
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
                 }
