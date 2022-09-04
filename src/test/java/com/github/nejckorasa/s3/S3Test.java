@@ -41,7 +41,7 @@ public class S3Test implements BeforeEachCallback, AfterEachCallback {
     @Override
     public void beforeEach(ExtensionContext extensionContext) {
         api = new S3Mock.Builder()
-                .withInMemoryBackend()
+                .withFileBackend("s3-backend")
                 .withPort(0)
                 .build();
 
