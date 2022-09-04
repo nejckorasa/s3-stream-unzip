@@ -2,7 +2,6 @@ package com.github.nejckorasa.s3;
 
 import com.github.nejckorasa.s3.unzip.S3UnzipManager;
 import com.github.nejckorasa.s3.unzip.strategy.NoSplitUnzipStrategy;
-import com.github.nejckorasa.s3.utils.FileUtils;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -21,11 +20,6 @@ public class UnzipTest {
     public static final String BUCKET_NAME = "test-bucket";
     @RegisterExtension
     private final S3Test s3 = new S3Test();
-
-    @Test
-    public void a() {
-        FileUtils.generateCsv("file.csv", 10000);
-    }
 
     @Test
     public void unzipsResources() {
