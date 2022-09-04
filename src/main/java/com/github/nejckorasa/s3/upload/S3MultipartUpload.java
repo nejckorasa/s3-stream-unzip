@@ -5,8 +5,8 @@ import com.amazonaws.services.s3.model.*;
 import com.github.nejckorasa.s3.upload.exception.S3MultipartUploadException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.With;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
@@ -16,12 +16,18 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
+import static com.amazonaws.services.s3.internal.Constants.MB;
+import static com.github.nejckorasa.s3.Assertions.assertNotBlank;
+import static com.github.nejckorasa.s3.Assertions.assertOrThrow;
+
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class S3MultipartUpload {
+
     public static final int MAX_UPLOAD_NUMBER = 10_000;
+    public static final int MIN_UPLOAD_PART_BYTES_SIZE = 5 * MB;
     private final AtomicInteger uploadPartNumber = new AtomicInteger(0);
-    private final S3MultipartUploadConfig config;
+    private final Config config;
     private final String bucketName;
     private final String key;
     private final ExecutorService executorService;
@@ -30,27 +36,35 @@ public class S3MultipartUpload {
     private volatile boolean isAborting = false;
     private final List<Future<PartETag>> partETagFutures = new ArrayList<>();
 
-    @Builder
-    @Getter
-    public static final class S3MultipartUploadConfig {
+    @NoArgsConstructor
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Config {
 
-        @Builder.Default
-        private final int awaitTerminationTimeSeconds = 2;
+        public static final Config DEFAULT = new Config();
 
-        @Builder.Default
-        private final int threadCount = 4;
+        @With
+        private int awaitTerminationTimeSeconds = 2;
 
-        @Builder.Default
-        private final int queueSize = 4;
+        @With
+        private int threadCount = 4;
 
-        private final CannedAccessControlList cannedAcl;
+        @With
+        private int queueSize = 4;
 
-        private final String contentType;
+        @With
+        private int uploadPartBytesLimit = 20 * MB;
 
+        @With
+        private CannedAccessControlList cannedAcl;
+
+        @With
+        private String contentType;
+
+        @With
         private Function<InitiateMultipartUploadRequest, InitiateMultipartUploadRequest> customizeInitiateUploadRequest;
     }
 
-    public S3MultipartUpload(String bucketName, String key, AmazonS3 s3Client, S3MultipartUploadConfig config) {
+    public S3MultipartUpload(String bucketName, String key, AmazonS3 s3Client, Config config) {
         var threadPoolExecutor = new ThreadPoolExecutor(
                 config.threadCount, config.threadCount,
                 0L, TimeUnit.MILLISECONDS,
@@ -66,6 +80,10 @@ public class S3MultipartUpload {
                 throw new RejectedExecutionException("Executor was interrupted while the task was waiting to be put on the work queue", e);
             }
         });
+
+        assertOrThrow(
+                () -> config.uploadPartBytesLimit < MIN_UPLOAD_PART_BYTES_SIZE,
+                "Part size cannot be smaller than " + MIN_UPLOAD_PART_BYTES_SIZE);
 
         this.config = config;
         this.executorService = threadPoolExecutor;
@@ -83,7 +101,7 @@ public class S3MultipartUpload {
         initRequest.setObjectMetadata(metadata);
 
         if (config.cannedAcl != null) {
-            initRequest.withCannedACL(config.getCannedAcl());
+            initRequest.withCannedACL(config.cannedAcl);
         }
 
         if (config.customizeInitiateUploadRequest != null) {
@@ -170,12 +188,6 @@ public class S3MultipartUpload {
             Thread.currentThread().interrupt();
         }
         executorService.shutdownNow();
-    }
-
-    private void assertNotBlank(String str, String errorMessage) {
-        if (str == null || str.isBlank()) {
-            throw new IllegalStateException(errorMessage);
-        }
     }
 
     private int incrementUploadNumber() {

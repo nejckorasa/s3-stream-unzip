@@ -1,10 +1,8 @@
 package com.github.nejckorasa.s3.unzip.strategy;
 
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import com.amazonaws.services.s3.AmazonS3;
 
 public interface UnzipStrategy {
-    void validate();
 
-    void unzip(String bucketName, String outputPrefix, ZipInputStream zipInputStream, ZipEntry zipEntry);
+    void unzip(UnzipTask unzipTask, AmazonS3 s3Client);
 }

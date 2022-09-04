@@ -6,8 +6,11 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.github.nejckorasa.s3.unzip.exception.S3UnzipException;
 import com.github.nejckorasa.s3.unzip.strategy.UnzipStrategy;
-import lombok.Builder;
+import com.github.nejckorasa.s3.unzip.strategy.UnzipTask;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.With;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -19,44 +22,42 @@ import static java.lang.System.currentTimeMillis;
 import static java.util.stream.Collectors.joining;
 
 @Slf4j
-@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class S3UnzipManager {
 
-    private UnzipStrategy unzipStrategy;
-
-    @Builder.Default
-    private List<String> contentTypes = List.of("application/zip");
+    @NonNull
+    private final UnzipStrategy unzipStrategy;
 
     @NonNull
     private final AmazonS3 s3Client;
 
-    public void unzipObject(S3Object s3Object, String outputPrefix) {
-        unzipStrategy.validate();
+    @With
+    private List<String> contentTypes = null;
 
+    public S3UnzipManager(@NonNull AmazonS3 s3Client, @NonNull UnzipStrategy unzipStrategy) {
+        this.s3Client = s3Client;
+        this.unzipStrategy = unzipStrategy;
+    }
+
+    public void unzipObject(S3Object s3Object, String outputPrefix) {
         unzip(s3Object, outputPrefix);
     }
 
-    public void unzipObjects(String bucket, String inputPrefix, String outputPrefix) {
-        unzipStrategy.validate();
-
-        findObjectSummaries(bucket, inputPrefix)
-                .forEach(objSum -> getObjectIfZip(bucket, objSum).ifPresent(obj -> unzip(obj, outputPrefix)));
+    public void unzipObjects(String bucketName, String inputPrefix, String outputPrefix) {
+        findObjectSummaries(bucketName, inputPrefix)
+                .forEach(objSum -> getObjectIfZip(bucketName, objSum).ifPresent(obj -> unzip(obj, outputPrefix)));
     }
 
-    public void unzipObjectsKeyContaining(String bucket, String inputPrefix, String keyMatchingString, String outputPrefix) {
-        unzipStrategy.validate();
-
-        findObjectSummaries(bucket, inputPrefix).stream()
+    public void unzipObjectsKeyContaining(String bucketName, String inputPrefix, String keyMatchingString, String outputPrefix) {
+        findObjectSummaries(bucketName, inputPrefix).stream()
                 .filter(objSum -> objSum.getKey().contains(keyMatchingString))
-                .forEach(objSum -> getObjectIfZip(bucket, objSum).ifPresent(obj -> unzip(obj, outputPrefix)));
+                .forEach(objSum -> getObjectIfZip(bucketName, objSum).ifPresent(obj -> unzip(obj, outputPrefix)));
     }
 
-    public void unzipObjectsKeyMatching(String bucket, String inputPrefix, String keyMatchingString, String outputPrefix) {
-        unzipStrategy.validate();
-
-        findObjectSummaries(bucket, inputPrefix).stream()
+    public void unzipObjectsKeyMatching(String bucketName, String inputPrefix, String keyMatchingString, String outputPrefix) {
+        findObjectSummaries(bucketName, inputPrefix).stream()
                 .filter(objSum -> objSum.getKey().matches(keyMatchingString))
-                .forEach(objSum -> getObjectIfZip(bucket, objSum).ifPresent(obj -> unzip(obj, outputPrefix)));
+                .forEach(objSum -> getObjectIfZip(bucketName, objSum).ifPresent(obj -> unzip(obj, outputPrefix)));
     }
 
     private void unzip(S3Object s3Object, String outputPrefix) {
@@ -74,7 +75,7 @@ public class S3UnzipManager {
             var zipEntry = zipInputStream.getNextEntry();
             while (zipEntry != null) {
                 var start = currentTimeMillis();
-                unzipStrategy.unzip(bucketName, outputPrefix, zipInputStream, zipEntry);
+                unzipStrategy.unzip(new UnzipTask(bucketName, outputPrefix, zipInputStream, zipEntry), s3Client);
                 log.info("Unzipped {} in {} s", zipEntry.getName(), (currentTimeMillis() - start) / 1000);
                 zipEntry = zipInputStream.getNextEntry();
             }
@@ -105,6 +106,9 @@ public class S3UnzipManager {
     }
 
     private boolean hasValidContentType(S3Object s3Object) {
+        if (contentTypes == null || contentTypes.isEmpty()) {
+            return true;
+        }
         return contentTypes.contains(s3Object.getObjectMetadata().getContentType());
     }
 }
