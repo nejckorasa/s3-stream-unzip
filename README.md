@@ -23,7 +23,7 @@ var config = new S3MultipartUpload.Config()
             return request;
         });
 
-UnzipStrategy strategy=new NoSplitUnzipStrategy(config);
+UnzipStrategy strategy = new NoSplitUnzipStrategy(config);
 
 // create S3UnzipManager
 var um = new S3UnzipManager(s3Client,strategy);
