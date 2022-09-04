@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.AmazonS3URI;
 import com.amazonaws.services.s3.model.CreateBucketRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3Object;
 import io.findify.s3mock.S3Mock;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.extension.AfterEachCallback;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -79,6 +81,23 @@ public class S3Test implements BeforeEachCallback, AfterEachCallback {
         return new Upload(path);
     }
 
+    public S3Object download(String s3Path) {
+        var uri = new AmazonS3URI(s3Path);
+        return s3Client.getObject(uri.getBucket(), uri.getKey());
+    }
+
+    public String downloadAsString(String s3Path) {
+        var s3Object = download(s3Path);
+        if (s3Object != null) {
+            try (var inputStream = s3Object.getObjectContent()) {
+                return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+        return null;
+    }
+
     public final class Upload {
         private final Map<String, String> resources;
         private boolean createBuckets = false;
@@ -87,8 +106,9 @@ public class S3Test implements BeforeEachCallback, AfterEachCallback {
         private Upload(String path) {
             resources = new HashMap<>();
             URL resource = currentThread().getContextClassLoader().getResource(path);
-            Files.list(Paths.get(requireNonNull(resource).toURI()))
-                    .forEach(p -> resources.put(p.toString(), p.getFileName().toString()));
+            try (var files = Files.list(Paths.get(requireNonNull(resource).toURI()))) {
+                files.forEach(p -> resources.put(p.toString(), p.getFileName().toString()));
+            }
         }
 
         public Upload creatingBuckets() {
