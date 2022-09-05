@@ -3,6 +3,7 @@ package com.github.nejckorasa.s3;
 import com.github.nejckorasa.s3.unzip.S3UnzipManager;
 import com.github.nejckorasa.s3.unzip.strategy.NoSplitUnzipStrategy;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -20,13 +21,16 @@ public class S3UnzipManagerTest {
     @RegisterExtension
     private final S3Test s3 = new S3Test();
 
-    @Test
-    public void unzipsResources() {
+    @BeforeEach
+    public void beforeEach() {
         s3.createBuckets(BUCKET_NAME);
         s3.uploadFrom("test-data/raw").to("s3://test-bucket/input");
         s3.uploadFrom("test-data/zip").contentType("application/zip").to("s3://test-bucket/input");
         s3.verifyBucketFileCount("s3://test-bucket", 3);
+    }
 
+    @Test
+    public void unzipsObjects() {
         var um = new S3UnzipManager(s3.s3Client, new NoSplitUnzipStrategy());
         um.unzipObjects(BUCKET_NAME, "input", "output");
 
@@ -38,12 +42,18 @@ public class S3UnzipManagerTest {
     }
 
     @Test
-    public void unzipsResourcesWithContentType() {
-        s3.createBuckets(BUCKET_NAME);
-        s3.uploadFrom("test-data/raw").to("s3://test-bucket/input");
-        s3.uploadFrom("test-data/zip").contentType("application/zip").to("s3://test-bucket/input");
-        s3.verifyBucketFileCount("s3://test-bucket", 3);
+    public void unzipsAnObject() {
+        var um = new S3UnzipManager(s3.s3Client, new NoSplitUnzipStrategy());
 
+        um.unzipObject(s3.download("s3://test-bucket/input/Archive.zip"), "output");
+        s3.verifyBucketFileCount("s3://test-bucket/output", 2);
+
+        assertMatchesJson(s3.downloadAsString("s3://test-bucket/output/file.json"), readFileAsString("test-data/raw/file.json"));
+        assertThat(s3.downloadAsString("s3://test-bucket/output/file.csv")).isEqualTo(readFileAsString("test-data/raw/file.csv"));
+    }
+
+    @Test
+    public void unzipsObjectsWithContentType() {
         var unzipStrategy = new NoSplitUnzipStrategy();
 
         new S3UnzipManager(s3.s3Client, unzipStrategy)
@@ -58,12 +68,7 @@ public class S3UnzipManagerTest {
     }
 
     @Test
-    public void unzipsResourcesMatchingKey() {
-        s3.createBuckets(BUCKET_NAME);
-        s3.uploadFrom("test-data/raw").to("s3://test-bucket/input");
-        s3.uploadFrom("test-data/zip").contentType("application/zip").to("s3://test-bucket/input");
-        s3.verifyBucketFileCount("s3://test-bucket", 3);
-
+    public void unzipsObjectsMatchingKey() {
         var um = new S3UnzipManager(s3.s3Client, new NoSplitUnzipStrategy());
 
         um.unzipObjectsKeyMatching(BUCKET_NAME, "input", "output", ".*\\.zip");
@@ -74,12 +79,7 @@ public class S3UnzipManagerTest {
     }
 
     @Test
-    public void unzipsResourcesContainingKey() {
-        s3.createBuckets(BUCKET_NAME);
-        s3.uploadFrom("test-data/raw").to("s3://test-bucket/input");
-        s3.uploadFrom("test-data/zip").contentType("application/zip").to("s3://test-bucket/input");
-        s3.verifyBucketFileCount("s3://test-bucket", 3);
-
+    public void unzipsObjectsContainingKey() {
         var um = new S3UnzipManager(s3.s3Client, new NoSplitUnzipStrategy());
 
         um.unzipObjectsKeyContaining(BUCKET_NAME, "input", "output", ".zip");
