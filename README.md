@@ -40,23 +40,3 @@ um.unzipObjectsKeyMatching("bucket-name", "input-path", "output-path", ".*\\.zip
 um.unzipObjectsKeyContaining("bucket-name", "input-path", "output-path", "-part-of-object-");
 um.unzipObject(s3Object, "output-path");
 ```
-
-## Contributions 
-Pull requests are welcome! Show your support [with a ★](https://github.com/nejckorasa/s3-stream-unzip/stargazers)
-
-## TODOs
-
-### Add SplitUnzipStrategy
-
-Add a strategy that allows larger files to be split to into multiple parts/files that are uploaded to S3.
-
-### ~~Improve tests w/ unzip of larger files~~ [DONE]
-
-Code has been tested manually with real S3 and is working, but is still missing tests. At the moment tests rely on S3Mock with in-memory
-backend. Test files are too small to trigger multipart upload with more than 1 part.
-
-- Improve tests with unzipping of larger files and actually test the multipart upload. Explore file-backend for S3Mock to generate larger
-  test files dynamically.
-- Improve overall test coverage
-
-### Publish the code to maven central if it proves to be useful
