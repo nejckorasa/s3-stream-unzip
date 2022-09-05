@@ -2,7 +2,7 @@
 
 # s3-stream-unzip
 
-Manages unzipping of data in AWS S3 without knowing the size beforehand and without keeping it all in memory or writing to disk.
+Manages unzipping of data in AWS S3 utilizing stream download and multipart upload. Unzipping is achieved without knowing the size beforehand and without keeping it all in memory or writing to disk.
 
 See [tests](src/test/java/com/github/nejckorasa/s3), namely [S3UnzipManagerTest](src/test/java/com/github/nejckorasa/s3/S3UnzipManagerTest.java) for examples on how to
 use [S3UnzipManager.java](src/main/java/com/github/nejckorasa/s3/unzip/S3UnzipManager.java) to manage unzipping, some examples:
