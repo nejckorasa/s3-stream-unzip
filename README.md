@@ -4,7 +4,7 @@
 
 Manages unzipping of data in AWS S3 utilizing stream download and multipart upload. Unzipping is achieved without knowing the size beforehand and without keeping it all in memory or writing to disk.
 
-See [tests](src/test/java/com/github/nejckorasa/s3), namely [S3UnzipManagerTest](src/test/java/com/github/nejckorasa/s3/S3UnzipManagerTest.java) for examples on how to
+See [tests](src/test/java/com/github/nejckorasa/s3) (namely [S3UnzipManagerTest](src/test/java/com/github/nejckorasa/s3/S3UnzipManagerTest.java)) for examples on how to
 use [S3UnzipManager.java](src/main/java/com/github/nejckorasa/s3/unzip/S3UnzipManager.java) to manage unzipping, some examples:
 
 ```java
@@ -40,6 +40,9 @@ um.unzipObjectsKeyMatching("bucket-name", "input-path", "output-path", ".*\\.zip
 um.unzipObjectsKeyContaining("bucket-name", "input-path", "output-path", "-part-of-object-");
 um.unzipObject(s3Object, "output-path");
 ```
+
+## Contributions 
+Pull requests are welcome! Show your support [with a ★](https://github.com/nejckorasa/s3-stream-unzip/stargazers)
 
 ## TODOs
 
