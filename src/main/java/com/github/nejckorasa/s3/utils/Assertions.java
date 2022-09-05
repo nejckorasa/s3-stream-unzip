@@ -1,4 +1,4 @@
-package com.github.nejckorasa.s3;
+package com.github.nejckorasa.s3.utils;
 
 import lombok.experimental.UtilityClass;
 

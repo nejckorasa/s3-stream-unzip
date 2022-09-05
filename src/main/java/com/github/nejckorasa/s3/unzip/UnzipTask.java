@@ -1,4 +1,4 @@
-package com.github.nejckorasa.s3.unzip.strategy;
+package com.github.nejckorasa.s3.unzip;
 
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
