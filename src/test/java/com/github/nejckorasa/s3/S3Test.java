@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.lang.Thread.currentThread;
+import static java.util.Comparator.reverseOrder;
 import static java.util.Objects.requireNonNull;
 
 public class S3Test implements BeforeEachCallback, AfterEachCallback {
@@ -68,6 +70,13 @@ public class S3Test implements BeforeEachCallback, AfterEachCallback {
     @Override
     public void afterEach(ExtensionContext extensionContext) {
         api.shutdown();
+        if (localFileBackendPath != null) {
+            try (var files = Files.walk(Path.of(localFileBackendPath))) {
+                files.sorted(reverseOrder()).map(Path::toFile).forEach(File::delete);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
     }
 
     public S3Test createBuckets(String bucketName, String... otherBuckets) {
@@ -104,6 +113,15 @@ public class S3Test implements BeforeEachCallback, AfterEachCallback {
         var s3Object = download(s3Path);
         try (var inputStream = s3Object.getObjectContent()) {
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public byte[] downloadAsBytes(String s3Path) {
+        var s3Object = download(s3Path);
+        try (var inputStream = s3Object.getObjectContent()) {
+            return inputStream.readAllBytes();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

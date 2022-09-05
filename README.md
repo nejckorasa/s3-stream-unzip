@@ -4,21 +4,26 @@
 
 Manages unzipping of data in AWS S3 without knowing the size beforehand and without keeping it all in memory or writing to disk.
 
-See [UnzipTest.java](src/test/java/com/github/nejckorasa/s3/UnzipTest.java) for examples on how to
-use [S3UnzipManager.java](src/main/java/com/github/nejckorasa/s3/unzip/S3UnzipManager.java) to manage unzipping, for example:
+See [tests](src/test/java/com/github/nejckorasa/s3), namely [S3UnzipManagerTest](src/test/java/com/github/nejckorasa/s3/S3UnzipManagerTest.java) for examples on how to
+use [S3UnzipManager.java](src/main/java/com/github/nejckorasa/s3/unzip/S3UnzipManager.java) to manage unzipping, some examples:
 
 ```java
+// initialize AmazonS3 client
+AmazonS3 s3CLient = AmazonS3ClientBuilder.standard()
+        // customize the client
+        .build()
+
 // create UnzipStrategy
 UnzipStrategy strategy = new NoSplitUnzipStrategy();
 
-// create UnzipStrategy with additional config
+// or create UnzipStrategy with additional config
 var config = new S3MultipartUpload.Config()
         .withThreadCount(5)
         .withQueueSize(5)
         .withAwaitTerminationTimeSeconds(2)
         .withCannedAcl(CannedAccessControlList.BucketOwnerFullControl)
         .withUploadPartBytesLimit(20 * MB)
-        .withCustomizeInitiateUploadRequest(request->{
+        .withCustomizeInitiateUploadRequest(request -> {
             // customize request
             return request;
         });
@@ -26,11 +31,14 @@ var config = new S3MultipartUpload.Config()
 UnzipStrategy strategy = new NoSplitUnzipStrategy(config);
 
 // create S3UnzipManager
-var um = new S3UnzipManager(s3Client,strategy);
+var um = new S3UnzipManager(s3Client, strategy);
+var um = new S3UnzipManager(s3Client, strategy.withContentTypes(List.of("application/zip"));
 
-// unzip
+// unzip options
 um.unzipObjects("bucket-name", "input-path", "output-path");
-um.unzipObjectsKeyMatching("bucket-name", "input-path", "output-path", "*.zip");
+um.unzipObjectsKeyMatching("bucket-name", "input-path", "output-path", ".*\\.zip");
+um.unzipObjectsKeyContaining("bucket-name", "input-path", "output-path", "-part-of-object-");
+um.unzipObject(s3Object, "output-path");
 ```
 
 ## TODOs
@@ -39,7 +47,7 @@ um.unzipObjectsKeyMatching("bucket-name", "input-path", "output-path", "*.zip");
 
 Add a strategy that allows larger files to be split to into multiple parts/files that are uploaded to S3.
 
-### Improve tests w/ unzip of larger files
+### ~~Improve tests w/ unzip of larger files~~ [DONE]
 
 Code has been tested manually with real S3 and is working, but is still missing tests. At the moment tests rely on S3Mock with in-memory
 backend. Test files are too small to trigger multipart upload with more than 1 part.
