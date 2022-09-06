@@ -91,7 +91,7 @@ public class S3MultipartUpload {
         this.s3Client = s3Client;
     }
 
-    public void initializeUpload() {
+    public void initialize() {
         var initRequest = new InitiateMultipartUploadRequest(bucketName, key);
         initRequest.setTagging(new ObjectTagging(new ArrayList<>()));
 
@@ -117,8 +117,16 @@ public class S3MultipartUpload {
         }
     }
 
+    public void uploadPart(byte[] bytes) {
+        uploadPart(new ByteArrayInputStream(bytes));
+    }
+
     public void uploadPart(ByteArrayInputStream inputStream) {
         submitUploadPart(inputStream, false);
+    }
+
+    public void uploadFinalPart(byte[] bytes) {
+        uploadFinalPart(new ByteArrayInputStream(bytes));
     }
 
     public void uploadFinalPart(ByteArrayInputStream inputStream) {

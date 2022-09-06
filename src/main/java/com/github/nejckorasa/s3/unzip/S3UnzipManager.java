@@ -73,7 +73,7 @@ public class S3UnzipManager {
             var zipEntry = zipInputStream.getNextEntry();
             while (zipEntry != null) {
                 var start = currentTimeMillis();
-                unzipStrategy.unzip(new UnzipTask(bucketName, outputPrefix, zipInputStream, zipEntry), s3Client);
+                unzipStrategy.unzip(new S3ZipFile(bucketName, outputPrefix, zipInputStream, zipEntry), s3Client);
                 log.info("Unzipped {} in {} s", zipEntry.getName(), (currentTimeMillis() - start) / 1000);
                 zipEntry = zipInputStream.getNextEntry();
             }

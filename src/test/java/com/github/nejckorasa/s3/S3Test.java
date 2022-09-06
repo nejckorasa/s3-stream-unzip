@@ -36,6 +36,8 @@ public class S3Test implements BeforeEachCallback, AfterEachCallback {
 
     String localFileBackendPath;
 
+    String defaultBucketName;
+
     S3Mock api;
 
     int port;
@@ -44,6 +46,11 @@ public class S3Test implements BeforeEachCallback, AfterEachCallback {
 
     public S3Test withLocalFileBackend(String path) {
         localFileBackendPath = path;
+        return this;
+    }
+
+    public S3Test withDefaultBucket(String bucketName) {
+        defaultBucketName = bucketName;
         return this;
     }
 
@@ -65,6 +72,10 @@ public class S3Test implements BeforeEachCallback, AfterEachCallback {
                 .withEndpointConfiguration(new EndpointConfiguration("http://localhost:" + port, US_EAST_1))
                 .withCredentials(new AWSStaticCredentialsProvider(new AnonymousAWSCredentials()))
                 .build();
+
+        if (defaultBucketName != null) {
+            createBuckets(defaultBucketName);
+        }
     }
 
     @Override
