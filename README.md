@@ -47,6 +47,8 @@ um.unzipObjectsKeyContaining("bucket-name", "input-path", "output-path", "-part-
 um.unzipObject(s3Object, "output-path");
 ```
 
+Inspired by: https://medium.com/@pra4mesh/uploading-inputstream-to-aws-s3-using-multipart-upload-java-add81b57964e
+
 ## Unzip strategies
 
 All strategies utilise stream download and multipart upload - unzipping is achieved without keeping all data in memory or writing to disk. 
