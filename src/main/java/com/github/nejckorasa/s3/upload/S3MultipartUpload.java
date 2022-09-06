@@ -2,7 +2,6 @@ package com.github.nejckorasa.s3.upload;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
-import com.github.nejckorasa.s3.upload.exception.S3MultipartUploadException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -17,8 +16,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import static com.amazonaws.services.s3.internal.Constants.MB;
-import static com.github.nejckorasa.s3.Assertions.assertNotBlank;
-import static com.github.nejckorasa.s3.Assertions.assertOrThrow;
+import static com.github.nejckorasa.s3.utils.Assertions.assertNotBlank;
+import static com.github.nejckorasa.s3.utils.Assertions.assertOrThrow;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -92,7 +91,7 @@ public class S3MultipartUpload {
         this.s3Client = s3Client;
     }
 
-    public void initializeUpload() {
+    public void initialize() {
         var initRequest = new InitiateMultipartUploadRequest(bucketName, key);
         initRequest.setTagging(new ObjectTagging(new ArrayList<>()));
 
@@ -118,8 +117,16 @@ public class S3MultipartUpload {
         }
     }
 
+    public void uploadPart(byte[] bytes) {
+        uploadPart(new ByteArrayInputStream(bytes));
+    }
+
     public void uploadPart(ByteArrayInputStream inputStream) {
         submitUploadPart(inputStream, false);
+    }
+
+    public void uploadFinalPart(byte[] bytes) {
+        uploadFinalPart(new ByteArrayInputStream(bytes));
     }
 
     public void uploadFinalPart(ByteArrayInputStream inputStream) {
@@ -184,6 +191,7 @@ public class S3MultipartUpload {
         log.debug("Shutting down executor service for uploadId {}", uploadId);
         executorService.shutdown();
         try {
+            //noinspection ResultOfMethodCallIgnored
             executorService.awaitTermination(config.awaitTerminationTimeSeconds, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             log.error("Interrupted while awaiting executor service shutdown");

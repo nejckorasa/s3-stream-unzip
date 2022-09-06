@@ -4,9 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
-import com.github.nejckorasa.s3.unzip.exception.S3UnzipException;
 import com.github.nejckorasa.s3.unzip.strategy.UnzipStrategy;
-import com.github.nejckorasa.s3.unzip.strategy.UnzipTask;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -75,7 +73,7 @@ public class S3UnzipManager {
             var zipEntry = zipInputStream.getNextEntry();
             while (zipEntry != null) {
                 var start = currentTimeMillis();
-                unzipStrategy.unzip(new UnzipTask(bucketName, outputPrefix, zipInputStream, zipEntry), s3Client);
+                unzipStrategy.unzip(new S3ZipFile(bucketName, outputPrefix, zipInputStream, zipEntry), s3Client);
                 log.info("Unzipped {} in {} s", zipEntry.getName(), (currentTimeMillis() - start) / 1000);
                 zipEntry = zipInputStream.getNextEntry();
             }

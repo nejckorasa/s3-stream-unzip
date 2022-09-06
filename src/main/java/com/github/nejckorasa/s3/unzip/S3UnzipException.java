@@ -1,4 +1,4 @@
-package com.github.nejckorasa.s3.unzip.exception;
+package com.github.nejckorasa.s3.unzip;
 
 public class S3UnzipException extends RuntimeException {
 

@@ -1,9 +1,9 @@
-package com.github.nejckorasa.s3.unzip.strategy;
+package com.github.nejckorasa.s3.unzip;
 
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public record UnzipTask(String bucketName, String outputPrefix, ZipInputStream inputStream, ZipEntry zipEntry) {
+public record S3ZipFile(String bucketName, String outputPrefix, ZipInputStream inputStream, ZipEntry zipEntry) {
     public String filename() {
         return zipEntry.getName();
     }

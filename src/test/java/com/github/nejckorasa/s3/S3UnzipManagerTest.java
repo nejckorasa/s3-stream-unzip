@@ -19,11 +19,10 @@ public class S3UnzipManagerTest {
     public static final String BUCKET_NAME = "test-bucket";
 
     @RegisterExtension
-    private final S3Test s3 = new S3Test();
+    private final S3Test s3 = new S3Test().withDefaultBucket(BUCKET_NAME);
 
     @BeforeEach
     public void beforeEach() {
-        s3.createBuckets(BUCKET_NAME);
         s3.uploadFrom("test-data/raw").to("s3://test-bucket/input");
         s3.uploadFrom("test-data/zip").contentType("application/zip").to("s3://test-bucket/input");
         s3.verifyBucketFileCount("s3://test-bucket", 3);
