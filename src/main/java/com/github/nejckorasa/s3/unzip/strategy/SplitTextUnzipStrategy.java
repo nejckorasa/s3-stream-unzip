@@ -16,9 +16,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 /**
  * Unzips and uploads a text file with splitting (sharding) - it creates a 1:n mappings between zipped and unzipped files.
  *
- * <p> It reads the file as UTF-8 text file (split into lines delimited {@link Character#isWhitespace(char)}, or specified {@link #delimiter}).
+ * <p> It reads the file as UTF-8 text file (split into lines delimited by {@link Character#isWhitespace(char)}, or specified {@link #delimiter}).
  * <p> Set {@link #header} to 'true' if zipped file contains a header that needs to be included with every split file/shard (e.g. csv files). Defaults to false.
- * <p> This strategy should ideally be used for smaller files.
+ * <p> This strategy is suitable for larger files as it splits them into smaller, more manageable unzipped files (shards).
  *
  * <p> Utilizes stream download and multipart upload - unzipping is achieved without keeping all data in memory or writing to disk.
  */
