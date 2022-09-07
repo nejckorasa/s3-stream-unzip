@@ -4,10 +4,10 @@
 
 Manages unzipping of data in AWS S3 utilizing stream download and multipart upload. Unzipping is achieved without knowing the size beforehand and without keeping it all in memory or writing to disk.
 
-Supports different unzip strategies including an option to split zipped files (suitable for larger files), see [SplitTextUnzipStrategy](src/main/java/com/github/nejckorasa/s3/unzip/strategy/SplitTextUnzipStrategy.java).
+Supports different unzip strategies including an option to split zipped files (suitable for larger files), see [SplitTextUnzipStrategy](src/main/java/io/github/nejckorasa/s3/unzip/strategy/SplitTextUnzipStrategy.java).
 
-See [tests](src/test/java/com/github/nejckorasa/s3) (namely [S3UnzipManagerTest](src/test/java/com/github/nejckorasa/s3/S3UnzipManagerTest.java)) for examples on how to
-use [S3UnzipManager.java](src/main/java/com/github/nejckorasa/s3/unzip/S3UnzipManager.java) to manage unzipping, some examples:
+See [tests](src/test/java/io/github/nejckorasa/s3) (namely [S3UnzipManagerTest](src/test/java/io/github/nejckorasa/s3/S3UnzipManagerTest.java)) for examples on how to
+use [S3UnzipManager.java](src/main/java/io/github/nejckorasa/s3/unzip/S3UnzipManager.java) to manage unzipping, some examples:
 
 ```java
 // initialize AmazonS3 client
@@ -19,7 +19,6 @@ AmazonS3 s3CLient = AmazonS3ClientBuilder.standard()
 var strategy = new NoSplitUnzipStrategy();
 var strategy = new SplitTextUnzipStrategy()
         .withHeader(true)
-        .withDelimiter("custom-delimiter")
         .withFileBytesLimit(100 * MB);
 
 // or create UnzipStrategy with additional config
@@ -55,17 +54,17 @@ All strategies utilise stream download and multipart upload - unzipping is achie
 
 Refer to tests for usage examples.
 
-### [NoSplitUnzipStrategy](src/main/java/com/github/nejckorasa/s3/unzip/strategy/NoSplitUnzipStrategy.java)
+### [NoSplitUnzipStrategy](src/main/java/io/github/nejckorasa/s3/unzip/strategy/NoSplitUnzipStrategy.java)
 Unzips and uploads a file without splitting (sharding) - it creates a 1:1 mapping between zipped and unzipped file.
 
 - File is read in bytes.
 
 This strategy should ideally be used for smaller files.
 
-### [SplitTextUnzipStrategy](src/main/java/com/github/nejckorasa/s3/unzip/strategy/SplitTextUnzipStrategy.java)
+### [SplitTextUnzipStrategy](src/main/java/io/github/nejckorasa/s3/unzip/strategy/SplitTextUnzipStrategy.java)
 Unzips and uploads a text file with splitting (sharding) - it creates a 1:n mappings between zipped and unzipped files.
 
-- It reads the file as UTF-8 text file (split into lines delimited by `Character#isWhitespace(char)` or specified delimiter).
+- It reads the file as UTF-8 text file split into lines.
 - Provides configurable file (shard) size. 
 - Can be configured to accommodate files with headers (e.g. csv files). 
 

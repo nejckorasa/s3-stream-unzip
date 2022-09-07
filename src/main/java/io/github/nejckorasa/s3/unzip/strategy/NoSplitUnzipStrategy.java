@@ -1,9 +1,9 @@
-package com.github.nejckorasa.s3.unzip.strategy;
+package io.github.nejckorasa.s3.unzip.strategy;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.github.nejckorasa.s3.unzip.S3UnzipException;
-import com.github.nejckorasa.s3.unzip.S3ZipFile;
-import com.github.nejckorasa.s3.upload.S3MultipartUpload;
+import io.github.nejckorasa.s3.unzip.S3UnzipException;
+import io.github.nejckorasa.s3.unzip.S3ZipFile;
+import io.github.nejckorasa.s3.upload.S3MultipartUpload;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,20 +16,33 @@ import static com.amazonaws.services.s3.internal.Constants.MB;
  *
  * <p> File is read in bytes. This strategy should ideally be used for smaller files.
  *
- * <p> Utilizes stream download and multipart upload - unzipping is achieved without keeping all data in memory or writing to disk.
+ * <p> Utilizes multipart upload - unzipping is achieved without keeping all data in memory or writing to disk.
  */
 @Slf4j
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class NoSplitUnzipStrategy implements UnzipStrategy {
 
+    /**
+     * File (shard) size limit, i.e. 100 MB will split the source zip entry into files with size limit of 100 MB
+     *
+     * @see S3MultipartUpload
+     */
     @NonNull
     @With
     private int uploadPartBytesLimit = 20 * MB;
 
+    /**
+     * Configuration for S3 multipart upload. Configures {@link S3MultipartUpload},
+     */
     @NonNull
     private S3MultipartUpload.Config config = S3MultipartUpload.Config.DEFAULT;
 
+    /**
+     * Creates NoSplitUnzipStrategy with provided configuration for {@link S3MultipartUpload}
+     *
+     * @param config Multipart upload configuration for {@link S3MultipartUpload}
+     */
     public NoSplitUnzipStrategy(@NonNull S3MultipartUpload.Config config) {
         this.config = config;
     }
@@ -41,7 +54,7 @@ public class NoSplitUnzipStrategy implements UnzipStrategy {
         long size = zipFile.size();
 
         String key = zipFile.key();
-        var s3MultipartUpload = new S3MultipartUpload(zipFile.bucketName(), key, s3Client, config);
+        var s3MultipartUpload = new S3MultipartUpload(zipFile.getBucketName(), key, s3Client, config);
         s3MultipartUpload.initialize();
 
         log.info("Unzipping {}, compressed: {} bytes, extracted: {} bytes to {}", filename, compressedSize, size, key);
@@ -54,7 +67,7 @@ public class NoSplitUnzipStrategy implements UnzipStrategy {
             byte[] data = new byte[uploadPartBytesLimit];
             var outputStream = new ByteArrayOutputStream();
 
-            while ((bytesRead = zipFile.inputStream().read(data, 0, data.length)) != -1) {
+            while ((bytesRead = zipFile.getInputStream().read(data, 0, data.length)) != -1) {
                 outputStream.write(data, 0, bytesRead);
 
                 if (uploadPartBytes < uploadPartBytesLimit) {

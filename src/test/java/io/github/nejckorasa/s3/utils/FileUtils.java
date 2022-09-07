@@ -1,6 +1,7 @@
-package com.github.nejckorasa.s3.utils;
+package io.github.nejckorasa.s3.utils;
 
 import lombok.SneakyThrows;
+import lombok.Value;
 import lombok.experimental.UtilityClass;
 
 import java.io.ByteArrayOutputStream;
@@ -64,7 +65,9 @@ public class FileUtils {
         return new TxtData(lines);
     }
 
-    public record TxtData(List<String> lines) {
+    @Value
+    public static class TxtData {
+        List<String> lines;
 
         public boolean hasLines() {
             return !lines.isEmpty();

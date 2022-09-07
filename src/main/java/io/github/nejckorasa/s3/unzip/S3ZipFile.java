@@ -1,9 +1,17 @@
-package com.github.nejckorasa.s3.unzip;
+package io.github.nejckorasa.s3.unzip;
+
+import lombok.Value;
 
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public record S3ZipFile(String bucketName, String outputPrefix, ZipInputStream inputStream, ZipEntry zipEntry) {
+@Value
+public class S3ZipFile {
+    String bucketName;
+    String outputPrefix;
+    ZipInputStream inputStream;
+    ZipEntry zipEntry;
+
     public String filename() {
         return zipEntry.getName();
     }

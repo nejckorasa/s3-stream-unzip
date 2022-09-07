@@ -1,4 +1,4 @@
-package com.github.nejckorasa.s3.upload;
+package io.github.nejckorasa.s3.upload;
 
 public class S3MultipartUploadException extends RuntimeException {
 

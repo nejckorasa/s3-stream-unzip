@@ -1,9 +1,9 @@
-package com.github.nejckorasa.s3.unzip.strategy;
+package io.github.nejckorasa.s3.unzip.strategy;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.github.nejckorasa.s3.unzip.S3UnzipException;
-import com.github.nejckorasa.s3.unzip.S3ZipFile;
-import com.github.nejckorasa.s3.upload.S3MultipartUpload;
+import io.github.nejckorasa.s3.unzip.S3UnzipException;
+import io.github.nejckorasa.s3.unzip.S3ZipFile;
+import io.github.nejckorasa.s3.upload.S3MultipartUpload;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,11 +16,11 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 /**
  * Unzips and uploads a text file with splitting (sharding) - it creates a 1:n mappings between zipped and unzipped files.
  *
- * <p> It reads the file as UTF-8 text file (split into lines delimited by {@link Character#isWhitespace(char)}, or specified {@link #delimiter}).
+ * <p> It reads the file as UTF-8 text file split into lines.
  * <p> Set {@link #header} to 'true' if zipped file contains a header that needs to be included with every split file/shard (e.g. csv files). Defaults to false.
  * <p> This strategy is suitable for larger files as it splits them into smaller, more manageable unzipped files (shards).
  *
- * <p> Utilizes stream download and multipart upload - unzipping is achieved without keeping all data in memory or writing to disk.
+ * <p> Utilizes multipart upload - unzipping is achieved without keeping all data in memory or writing to disk.
  */
 @Slf4j
 @NoArgsConstructor
@@ -29,23 +29,39 @@ public class SplitTextUnzipStrategy implements UnzipStrategy {
 
     public static final String LINE_BREAK = "\n";
 
+    /**
+     * S3 multipart upload part limit in bytes.
+     *
+     * @see S3MultipartUpload
+     */
     @NonNull
     @With
     private int uploadPartBytesLimit = 20 * MB;
 
-    @With
-    private String delimiter = null;
-
+    /**
+     * Add a header line to all files, i.e. first line of the source zip entry will be replicated to all output files
+     */
     @With
     private boolean header = false;
 
+    /**
+     * File (shard) size limit, i.e. 100 MB will split the source zip entry into files with size limit of 100 MB
+     */
     @NonNull
     @With
     private long fileBytesLimit = 100 * MB;
 
+    /**
+     * Configuration for S3 multipart upload. Configures {@link S3MultipartUpload},
+     */
     @NonNull
     private S3MultipartUpload.Config config = S3MultipartUpload.Config.DEFAULT;
 
+    /**
+     * Creates SplitTextUnzipStrategy with provided configuration for {@link S3MultipartUpload}
+     *
+     * @param config Multipart upload configuration for {@link S3MultipartUpload}
+     */
     public SplitTextUnzipStrategy(@NonNull S3MultipartUpload.Config config) {
         this.config = config;
     }
@@ -55,19 +71,14 @@ public class SplitTextUnzipStrategy implements UnzipStrategy {
         String filename = zipFile.filename();
         long compressedSize = zipFile.compressedSize();
         long size = zipFile.size();
-
         String key = zipFile.key();
 
         log.info("Unzipping {}, compressed: {} bytes, extracted: {} bytes to {}", filename, compressedSize, size, key);
 
         int fileNumber = 1;
-
-        Scanner scanner = new Scanner(zipFile.inputStream(), UTF_8);
-        if (delimiter != null) {
-            scanner.useDelimiter(delimiter);
-        }
-
+        Scanner scanner = new Scanner(zipFile.getInputStream(), UTF_8);
         var s3MultipartUpload = initializeS3MultipartUpload(s3Client, zipFile, fileNumber);
+
         try {
             var outputStream = new ByteArrayOutputStream();
 
@@ -146,8 +157,10 @@ public class SplitTextUnzipStrategy implements UnzipStrategy {
         String filenameWithNumber = fileNumber + "-" + s3ZipFile.filename();
         log.debug("Initializing upload for file: {}", filenameWithNumber);
 
-        var multipartUpload = new S3MultipartUpload(s3ZipFile.bucketName(), s3ZipFile.outputPrefix() + filenameWithNumber, s3Client, config);
+        String key = s3ZipFile.getOutputPrefix() + filenameWithNumber;
+        var multipartUpload = new S3MultipartUpload(s3ZipFile.getBucketName(), key, s3Client, config);
         multipartUpload.initialize();
+
         return multipartUpload;
     }
 

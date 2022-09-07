@@ -1,10 +1,10 @@
-package com.github.nejckorasa.s3.unzip;
+package io.github.nejckorasa.s3.unzip;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
-import com.github.nejckorasa.s3.unzip.strategy.UnzipStrategy;
+import io.github.nejckorasa.s3.unzip.strategy.UnzipStrategy;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -19,6 +19,13 @@ import java.util.zip.ZipInputStream;
 import static java.lang.System.currentTimeMillis;
 import static java.util.stream.Collectors.joining;
 
+/**
+ * Utility for managing unzipping of objects in Amazon S3.
+ * <p>
+ * Manages unzipping of data in AWS S3 utilizing stream download and multipart upload. Unzipping is achieved without knowing the size beforehand and without keeping it all in memory or writing to disk.
+ * <p>
+ * Supports different unzip strategies, see {@link UnzipStrategy}
+ */
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class S3UnzipManager {

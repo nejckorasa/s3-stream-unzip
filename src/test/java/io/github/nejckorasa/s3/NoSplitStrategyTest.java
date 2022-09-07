@@ -1,8 +1,8 @@
-package com.github.nejckorasa.s3;
+package io.github.nejckorasa.s3;
 
-import com.github.nejckorasa.s3.unzip.S3UnzipManager;
-import com.github.nejckorasa.s3.unzip.strategy.NoSplitUnzipStrategy;
-import com.github.nejckorasa.s3.utils.FileUtils;
+import io.github.nejckorasa.s3.unzip.S3UnzipManager;
+import io.github.nejckorasa.s3.unzip.strategy.NoSplitUnzipStrategy;
+import io.github.nejckorasa.s3.utils.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
