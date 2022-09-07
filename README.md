@@ -45,8 +45,27 @@ um.unzipObjectsKeyMatching("bucket-name", "input-path", "output-path", ".*\\.zip
 um.unzipObjectsKeyContaining("bucket-name", "input-path", "output-path", "-part-of-object-");
 um.unzipObject(s3Object, "output-path");
 ```
-
 Inspired by: https://medium.com/@pra4mesh/uploading-inputstream-to-aws-s3-using-multipart-upload-java-add81b57964e
+
+## Usage
+
+Available in Maven Central.
+
+#### Maven
+
+```xml
+<dependency>
+    <groupId>io.github.nejckorasa</groupId>
+    <artifactId>s3-stream-unzip</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+#### Gradle
+
+```groovy
+compile 'io.github.nejckorasa:s3-stream-unzip:1.0.0'
+```
 
 ## Unzip strategies
 
