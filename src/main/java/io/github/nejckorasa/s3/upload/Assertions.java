@@ -1,17 +1,17 @@
-package com.github.nejckorasa.s3.utils;
+package io.github.nejckorasa.s3.upload;
 
 import lombok.experimental.UtilityClass;
 
 import java.util.function.Supplier;
 
 @UtilityClass
-public class Assertions {
+class Assertions {
 
-    public static void assertNotBlank(String str, String errorMessage) {
+    static void assertNotBlank(String str, String errorMessage) {
         assertOrThrow(() -> str == null || str.isBlank(), errorMessage);
     }
 
-    public static void assertOrThrow(Supplier<Boolean> assertion, String errorMessage) {
+    static void assertOrThrow(Supplier<Boolean> assertion, String errorMessage) {
         if (assertion.get()) {
             throw new IllegalStateException(errorMessage);
         }

@@ -1,4 +1,4 @@
-package com.github.nejckorasa.s3.upload;
+package io.github.nejckorasa.s3.upload;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
@@ -16,8 +16,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import static com.amazonaws.services.s3.internal.Constants.MB;
-import static com.github.nejckorasa.s3.utils.Assertions.assertNotBlank;
-import static com.github.nejckorasa.s3.utils.Assertions.assertOrThrow;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -80,7 +78,7 @@ public class S3MultipartUpload {
             }
         });
 
-        assertOrThrow(
+        Assertions.assertOrThrow(
                 () -> config.uploadPartBytesLimit < MIN_UPLOAD_PART_BYTES_SIZE,
                 "Part size cannot be smaller than " + MIN_UPLOAD_PART_BYTES_SIZE);
 
@@ -143,9 +141,9 @@ public class S3MultipartUpload {
     }
 
     private void submitUploadPart(ByteArrayInputStream inputStream, boolean finalPart) {
-        assertNotBlank(uploadId, "uploadId has not been set");
-        assertNotBlank(bucketName, "bucketName has not been set");
-        assertNotBlank(key, "key has not been set");
+        Assertions.assertNotBlank(uploadId, "uploadId has not been set");
+        Assertions.assertNotBlank(bucketName, "bucketName has not been set");
+        Assertions.assertNotBlank(key, "key has not been set");
 
         submitTask(() -> {
             int partNumber = incrementUploadNumber();

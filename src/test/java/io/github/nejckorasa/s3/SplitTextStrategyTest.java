@@ -1,8 +1,8 @@
-package com.github.nejckorasa.s3;
+package io.github.nejckorasa.s3;
 
-import com.github.nejckorasa.s3.unzip.S3UnzipManager;
-import com.github.nejckorasa.s3.unzip.strategy.SplitTextUnzipStrategy;
-import com.github.nejckorasa.s3.utils.FileUtils;
+import io.github.nejckorasa.s3.unzip.S3UnzipManager;
+import io.github.nejckorasa.s3.unzip.strategy.SplitTextUnzipStrategy;
+import io.github.nejckorasa.s3.utils.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import static com.amazonaws.services.s3.internal.Constants.MB;
-import static com.github.nejckorasa.s3.utils.FileUtils.readTxt;
+import static io.github.nejckorasa.s3.utils.FileUtils.readTxt;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class SplitTextStrategyTest {
@@ -85,7 +85,7 @@ public class SplitTextStrategyTest {
     private void assertMatchesDataSplitInObjects(byte[] data, boolean withHeader, List<String> objectPaths) {
         var expected = readTxt(new ByteArrayInputStream(data));
 
-        var linesIterator = expected.lines().iterator();
+        var linesIterator = expected.getLines().iterator();
         if (withHeader) {
             linesIterator.next();
         }

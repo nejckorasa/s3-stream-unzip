@@ -1,7 +1,7 @@
-package com.github.nejckorasa.s3;
+package io.github.nejckorasa.s3;
 
-import com.github.nejckorasa.s3.unzip.S3UnzipManager;
-import com.github.nejckorasa.s3.unzip.strategy.NoSplitUnzipStrategy;
+import io.github.nejckorasa.s3.unzip.S3UnzipManager;
+import io.github.nejckorasa.s3.unzip.strategy.NoSplitUnzipStrategy;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.util.List;
 
-import static com.github.nejckorasa.s3.utils.FileUtils.readFileAsString;
+import static io.github.nejckorasa.s3.utils.FileUtils.readFileAsString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONCompareMode.LENIENT;
 

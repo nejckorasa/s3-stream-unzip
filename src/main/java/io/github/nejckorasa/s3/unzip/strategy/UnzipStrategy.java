@@ -1,7 +1,7 @@
-package com.github.nejckorasa.s3.unzip.strategy;
+package io.github.nejckorasa.s3.unzip.strategy;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.github.nejckorasa.s3.unzip.S3ZipFile;
+import io.github.nejckorasa.s3.unzip.S3ZipFile;
 
 public interface UnzipStrategy {
 

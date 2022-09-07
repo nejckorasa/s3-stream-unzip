@@ -1,4 +1,4 @@
-package com.github.nejckorasa.s3;
+package io.github.nejckorasa.s3;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.AnonymousAWSCredentials;
@@ -102,7 +102,7 @@ public class S3Test implements BeforeEachCallback, AfterEachCallback {
         var uri = new AmazonS3URI(s3Path);
         var fileCount = s3Client.listObjects(uri.getBucket(), uri.getKey()).getObjectSummaries().size();
         if (fileCount != expectedCount) {
-            throw new AssertionError("Expected %d got %d files in %s".formatted(expectedCount, fileCount, uri.getBucket()));
+            throw new AssertionError(String.format("Expected %d got %d files in %s", expectedCount, fileCount, uri.getBucket()));
         }
         return this;
     }
