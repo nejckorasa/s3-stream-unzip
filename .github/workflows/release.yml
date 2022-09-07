@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up Apache Maven Central
-        uses: actions/setup-java@latest
+        uses: actions/setup-java@v3
         with:
           java-version: '11'
           distribution: 'temurin'
@@ -20,7 +20,7 @@ jobs:
           gpg-private-key: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
       - name: Publish to Apache Maven Central
-        run: mvn --batch-mode deploy
+        run: mvn deploy
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_CENTRAL_TOKEN: ${{ secrets.OSSRH_PASSWORD }}
