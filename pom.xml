@@ -6,7 +6,7 @@
 
     <groupId>io.github.nejckorasa</groupId>
     <artifactId>s3-stream-unzip</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
 
     <name>s3-stream-unzip</name>
