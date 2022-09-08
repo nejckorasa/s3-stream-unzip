@@ -49,7 +49,7 @@ Inspired by: https://medium.com/@pra4mesh/uploading-inputstream-to-aws-s3-using-
 
 ## Usage
 
-Available in Maven Central.
+Available on [Maven Central](https://search.maven.org/artifact/io.github.nejckorasa/s3-stream-unzip/1.0.0/jar).
 
 #### Maven
 
