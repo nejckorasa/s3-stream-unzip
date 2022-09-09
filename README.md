@@ -1,4 +1,5 @@
 [![Maven Build](https://github.com/nejckorasa/s3-stream-unzip/actions/workflows/maven.yml/badge.svg)](https://github.com/nejckorasa/s3-stream-unzip/actions/workflows/maven.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.nejckorasa/s3-stream-unzip.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.github.nejckorasa%22%20AND%20a:%22s3-stream-unzip%22)
 
 # s3-stream-unzip
 
