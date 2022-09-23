@@ -3,7 +3,9 @@
 
 # s3-stream-unzip
 
-Manages unzipping of data in AWS S3 utilizing stream download and multipart upload. Unzipping is achieved without knowing the size beforehand and without keeping it all in memory or writing to disk.
+Manages unzipping of data in AWS S3 utilizing stream download and multipart upload. 
+
+Unzipping is achieved without knowing the size beforehand and without keeping it all in memory or writing to disk. That makes it suitable for large data files - it has been used to unzip files of size 100GB+.
 
 Supports different unzip strategies including an option to split zipped files (suitable for larger files), see [SplitTextUnzipStrategy](src/main/java/io/github/nejckorasa/s3/unzip/strategy/SplitTextUnzipStrategy.java).
 
