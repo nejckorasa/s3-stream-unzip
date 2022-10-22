@@ -62,14 +62,14 @@ Available on [Maven Central](https://search.maven.org/artifact/io.github.nejckor
 <dependency>
     <groupId>io.github.nejckorasa</groupId>
     <artifactId>s3-stream-unzip</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
 #### Gradle
 
 ```groovy
-compile 'io.github.nejckorasa:s3-stream-unzip:1.0.0'
+compile 'io.github.nejckorasa:s3-stream-unzip:1.0.1'
 ```
 
 ## Unzip strategies
