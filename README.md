@@ -3,16 +3,20 @@
 
 # s3-stream-unzip
 
-Manages unzipping of data in AWS S3 utilizing stream download and multipart upload. 
+Manages unzipping of data in AWS S3 utilizing stream download and multipart upload.
 
 Lightweight, only requires AmazonS3 client to run.
 
-Unzipping is achieved without knowing the size beforehand and without keeping it all in memory or writing to disk. That makes it suitable for large data files - it has been used to unzip files of size 100GB+.
+
+Unzipping is achieved without knowing the size beforehand and without keeping it all in memory or writing to disk. That makes it suitable for large data 
+files - it has been used to unzip files of size 100GB+.
+
+> Read more on why the tool was built: [nejckorasa.github.io/posts/s3-unzip/](https://nejckorasa.github.io/posts/s3-unzip/).
 
 Supports different unzip strategies including an option to split zipped files (suitable for larger files), see [SplitTextUnzipStrategy](src/main/java/io/github/nejckorasa/s3/unzip/strategy/SplitTextUnzipStrategy.java).
 
 See [tests](src/test/java/io/github/nejckorasa/s3) (namely [S3UnzipManagerTest](src/test/java/io/github/nejckorasa/s3/S3UnzipManagerTest.java)) for examples on how to
-use [S3UnzipManager.java](src/main/java/io/github/nejckorasa/s3/unzip/S3UnzipManager.java) to manage unzipping, some examples:
+use [S3UnzipManager.java](src/main/java/io/github/nejckorasa/s3/unzip/S3UnzipManager.java) to manage unzipping, some examples below. 
 
 ```java
 // initialize AmazonS3 client
@@ -50,7 +54,8 @@ um.unzipObjectsKeyMatching("bucket-name", "input-path", "output-path", ".*\\.zip
 um.unzipObjectsKeyContaining("bucket-name", "input-path", "output-path", "-part-of-object-");
 um.unzipObject(s3Object, "output-path");
 ```
-Inspired by: https://medium.com/@pra4mesh/uploading-inputstream-to-aws-s3-using-multipart-upload-java-add81b57964e
+
+Inspired by [this blog post](https://medium.com/@pra4mesh/uploading-inputstream-to-aws-s3-using-multipart-upload-java-add81b57964e).
 
 ## Usage
 
