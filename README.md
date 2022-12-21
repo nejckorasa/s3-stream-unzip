@@ -59,7 +59,7 @@ Inspired by [this blog post](https://medium.com/@pra4mesh/uploading-inputstream-
 
 ## Usage
 
-Available on [Maven Central](https://search.maven.org/artifact/io.github.nejckorasa/s3-stream-unzip/1.0.0/jar).
+Available on [Maven Central](https://search.maven.org/artifact/io.github.nejckorasa/s3-stream-unzip/1.0.3/jar).
 
 #### Maven
 
@@ -67,14 +67,14 @@ Available on [Maven Central](https://search.maven.org/artifact/io.github.nejckor
 <dependency>
     <groupId>io.github.nejckorasa</groupId>
     <artifactId>s3-stream-unzip</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.3</version>
 </dependency>
 ```
 
 #### Gradle
 
 ```groovy
-compile 'io.github.nejckorasa:s3-stream-unzip:1.0.1'
+compile 'io.github.nejckorasa:s3-stream-unzip:1.0.3'
 ```
 
 ## Unzip strategies
