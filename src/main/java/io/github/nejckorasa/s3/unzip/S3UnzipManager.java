@@ -79,6 +79,11 @@ public class S3UnzipManager {
         try (var zipInputStream = new ZipInputStream(s3Object.getObjectContent())) {
             var zipEntry = zipInputStream.getNextEntry();
             while (zipEntry != null) {
+                if (zipEntry.isDirectory()) {
+                    log.debug("Skipping directory {}", zipEntry.getName());
+                    zipEntry = zipInputStream.getNextEntry();
+                    continue;
+                }
                 var start = currentTimeMillis();
                 unzipStrategy.unzip(new S3ZipFile(bucketName, outputPrefix, zipInputStream, zipEntry), s3Client);
                 log.info("Unzipped {} in {} s", zipEntry.getName(), (currentTimeMillis() - start) / 1000);
