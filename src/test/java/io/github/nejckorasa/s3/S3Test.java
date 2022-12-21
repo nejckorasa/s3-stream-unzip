@@ -9,8 +9,10 @@ import com.amazonaws.services.s3.AmazonS3URI;
 import com.amazonaws.services.s3.model.CreateBucketRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import io.findify.s3mock.S3Mock;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -23,13 +25,19 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Comparator.reverseOrder;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static org.assertj.core.api.Assertions.assertThat;
 
+@Slf4j
 public class S3Test implements BeforeEachCallback, AfterEachCallback {
 
     public static final String US_EAST_1 = "us-east-1";
@@ -100,10 +108,20 @@ public class S3Test implements BeforeEachCallback, AfterEachCallback {
 
     public S3Test verifyBucketFileCount(String s3Path, int expectedCount) {
         var uri = new AmazonS3URI(s3Path);
-        var fileCount = s3Client.listObjects(uri.getBucket(), uri.getKey()).getObjectSummaries().size();
+        var objectSummaries = s3Client.listObjects(uri.getBucket(), uri.getKey()).getObjectSummaries();
+        log.debug("Object summaries {}", objectSummaries.stream().map(S3ObjectSummary::getKey).collect(joining(",", "[", "]")));
+        var fileCount = objectSummaries.size();
         if (fileCount != expectedCount) {
             throw new AssertionError(String.format("Expected %d got %d files in %s", expectedCount, fileCount, uri.getBucket()));
         }
+        return this;
+    }
+
+    public S3Test verifyContainsFiles(String s3Path, String... expectedObjectKeys) {
+        var uri = new AmazonS3URI(s3Path);
+        var objectSummaries = s3Client.listObjects(uri.getBucket(), uri.getKey()).getObjectSummaries();
+        List<String> objectKeys = objectSummaries.stream().map(S3ObjectSummary::getKey).collect(toList());
+        assertThat(objectKeys).containsAll(Arrays.asList(expectedObjectKeys));
         return this;
     }
 
