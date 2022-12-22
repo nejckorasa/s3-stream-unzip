@@ -3,7 +3,7 @@
 
 # s3-stream-unzip
 
-Manages unzipping of data in AWS S3 utilizing stream download and multipart upload.
+Unzip data in S3 with Java, utilizing stream download and multipart upload.
 
 Lightweight, only requires AmazonS3 client to run.
 
